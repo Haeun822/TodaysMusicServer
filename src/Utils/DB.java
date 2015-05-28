@@ -5,6 +5,7 @@ import java.sql.*;
 public class DB {
 	static Connection conn;
 	static Statement st;
+	static ResultSet rs;
 	
 	static{
 		try {
@@ -21,7 +22,26 @@ public class DB {
 		  catch (SQLException e) { }
 	}
 	
-	public static void registerUser(String ID, String PW){
+	public static String userCheck(String ID, String PW){
+		try {
+			rs = st.executeQuery("SELECT * FROM User WHERE ID = '" + ID + "';");
+			while(rs.next()){
+				if(rs.getString("PW").equals(PW))
+					return "Match";
+				else return "Wrong PW";
+			}
+			return "Can't Find";
+		} catch (SQLException e) { }
 		
+		return "Failed";
+	}
+	
+	public static String registerUser(String ID, String PW){
+		try {
+			st.executeUpdate("INSERT INTO User VALUES('" + ID + "', '" + PW + "');");
+			return "Success";
+		} catch (SQLException e) { }
+		
+		return "Failed";
 	}
 }

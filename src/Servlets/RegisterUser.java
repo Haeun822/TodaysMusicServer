@@ -13,9 +13,8 @@ import org.json.simple.JSONValue;
 
 import Utils.DB;
 
-@WebServlet("/UserCheck")
-public class UserCheck extends HttpServlet {
-
+@WebServlet("/RegisterUser")
+public class RegisterUser extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
@@ -28,7 +27,7 @@ public class UserCheck extends HttpServlet {
 		if(JSON != null){
 			JSONObject json = (JSONObject) JSONValue.parse(JSON);
 			
-			String checkValue = DB.userCheck(json.get("ID").toString(), json.get("PW").toString());
+			String checkValue = DB.registerUser(json.get("ID").toString(), json.get("PW").toString());
 		
 			json.clear();
 			json.put("Check", checkValue);
@@ -41,5 +40,4 @@ public class UserCheck extends HttpServlet {
 		}
 		
 	}
-
 }

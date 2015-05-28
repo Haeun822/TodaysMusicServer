@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 
+import Utils.MusicServer;
+
 @WebServlet("/Test")
 public class Test extends HttpServlet {
 	
@@ -22,11 +24,21 @@ public class Test extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		JSONObject json = new JSONObject();
+		String artist = "", title = "";
 		
-		json.put("ID", "testID");
-		json.put("PW", 12345);
+		request.setCharacterEncoding("UTF-8");
 		
-		response.sendRedirect("/TDM/UserCheck?JSON=" + json.toString());
+		if(request.getParameter("artist") != null)
+			artist = request.getParameter("artist");
+		if(request.getParameter("title") != null)
+			title = request.getParameter("title");
+
+		System.out.println(artist + " - " + title);
+		
+		if(!artist.isEmpty() || !title.isEmpty()){
+			JSONObject json = MusicServer.searchMusic(artist, title, 0, 10);
+			response.setContentType("text/html; charset=UTF-8");
+			response.getWriter().print(json.toString());
+		}
 	}
 }
