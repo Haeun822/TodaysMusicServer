@@ -44,4 +44,24 @@ public class DB {
 		
 		return "Failed";
 	}
+	
+	public static void registerMusic(String ID, String Title, String Artist, String URL){
+		try {
+			st.executeUpdate("INSERT INTO Music VALUES('" + ID + "', '" + Title + "', '" + Artist + "', '" + URL + "')"
+							+ "ON DUPLICATE KEY UPDATE ID = '" + ID + "', Title = '" + Title + "', Artist = '" + Artist + "', URL = '" + URL + "';");
+		} catch (SQLException e) { }
+	}
+	
+	public static void registerMusicList(String userID, String musicID, int star, String time, String feel, int isShared){
+		try{
+			rs = st.executeQuery("SELECT * FROM List WHERE UserID = '" + userID + "' AND MusicID = '" + musicID + "';");
+			if(rs.next()){
+				st.executeUpdate("UPDATE List SET Star=" + star + ", Time='" + time + "', Feel='" + feel + "', SharedTime = CURRENT_TIMESTAMP, IsShared = " + isShared
+								+ " WHERE UserID = '" + userID + "' AND MusicID = '" + musicID + "';");
+			}
+			else{
+				st.executeUpdate("INSERT INTO List VALUES('" + userID + "', '" + musicID + "', " + star + ", '" + time + "', '" + feel + "', CURRENT_TIMESTAMP, '" + isShared + "');");
+			}
+		} catch (SQLException e) { }
+	}
 }
