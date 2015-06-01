@@ -1,6 +1,10 @@
 package Utils;
 
 import java.sql.*;
+import java.util.ArrayList;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class DB {
 	static Connection conn;
@@ -63,5 +67,71 @@ public class DB {
 				st.executeUpdate("INSERT INTO List VALUES('" + userID + "', '" + musicID + "', " + star + ", '" + time + "', '" + feel + "', CURRENT_TIMESTAMP, '" + isShared + "');");
 			}
 		} catch (SQLException e) { }
+	}
+
+	public static ArrayList<JSONObject> getMusicList(String ID){
+		ArrayList<JSONObject> list = new ArrayList<JSONObject>();
+		
+		try{
+			rs = st.executeQuery("SELECT * FROM List WHERE UserID = '" + ID + "';");
+			while(rs.next()){
+				JSONObject json = new JSONObject();
+				json.put("MusicID", rs.getString("MusicID"));
+				json.put("Star", rs.getInt("Star"));
+				json.put("Time", rs.getString("Time"));
+				json.put("Feel", rs.getString("Feel"));
+				json.put("SharedTime", rs.getTimestamp("SharedTime").toString());
+				
+				list.add(json);
+			}
+		} catch (SQLException e) { }
+		
+		return list;
+	}
+	
+	public static ArrayList<JSONObject> getTimeLine(String ID, ArrayList<String> Followed){
+		ArrayList<JSONObject> list = new ArrayList<JSONObject>();
+		
+		try{
+			String query = "SELECT * FROM List WHERE ";
+			query += "UserID = '" + ID + "' ";
+			for(int i=0; i<Followed.size(); i++)
+				query += " OR UserID = '" + Followed.get(i) + "' ";
+			query += ";";
+			
+			rs = st.executeQuery(query);
+			while(rs.next()){
+				JSONObject json = new JSONObject();
+				json.put("UserID", rs.getString("UserID"));
+				json.put("MusicID", rs.getString("MusicID"));
+				json.put("Star", rs.getInt("Star"));
+				json.put("Time", rs.getString("Time"));
+				json.put("Feel", rs.getString("Feel"));
+				json.put("SharedTime", rs.getTimestamp("SharedTime").toString());
+				
+				list.add(json);
+			}
+			
+		} catch (SQLException e) { }
+		
+		return list;
+	}
+	
+	public static void registerFollow(String userID, String followedID){
+		try {
+			st.executeUpdate("INSERT IGNORE INTO Follow VALUES('" + userID + "', '" + followedID + "');");
+		} catch (SQLException e) { }
+	}
+	
+	public static ArrayList<String> getFollowedUsers(String userID){
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			rs = st.executeQuery("SELECT Followed FROM Follow WHERE Follower = '" + userID + "';");
+			
+			while(rs.next())
+				list.add(rs.getString("Followed"));
+		} catch (SQLException e) { }
+		
+		return list;
 	}
 }
