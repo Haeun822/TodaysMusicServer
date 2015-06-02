@@ -32,9 +32,53 @@ public class Manager {
 	
 	public static JSONObject Recommend(String ID, String time, String feel){
 		ArrayList<JSONObject> list = DB.getMusicList(ID);
-		
-		JSONObject result = MusicServer.recommendMusic((String)list.get(0).get("MusicID"), 10);
-		
+		ArrayList<JSONObject> resultList = new ArrayList<JSONObject>();
+
+		int itemNum = 10;
+		for (int i = 0; i < list.size(); i++) {
+			JSONObject temp = MusicServer.recommendMusic((String) list.get(i)
+					.get("MusicID"), itemNum);
+			JSONArray tempArray = (JSONArray) temp.get("tracks");
+			int star = (int) list.get(i).get("Star");
+
+			for (int j = 0; j < tempArray.size(); j++) {
+				JSONObject json = (JSONObject) tempArray.get(j);
+				if (resultList.size() == 0) {
+					resultList.add(json);
+					resultList.get(0).put("tscore",	star * 10 + (double) json.get("score"));
+				} else if (resultList.contains(json))
+					break;
+				else {
+					for (int k = 0; k < resultList.size(); k++) {
+
+						if ((double) resultList.get(k).get("tscore") < (star * 10 + (double) json
+								.get("score"))) {
+							resultList.add(k, json);
+							resultList.get(k).put("tscore",	star * 10 + (double) json.get("score"));
+							break;
+						}
+					}
+				}
+
+				if (resultList.size() > itemNum) {
+					resultList.remove(itemNum);
+				}
+			}
+		}
+
+		JSONObject result = new JSONObject();
+		result.put("List", resultList);
+
+		return result;
+	}
+	
+	public static JSONObject getMusicList(String ID){
+		ArrayList<JSONObject> list = DB.getMusicList(ID);
+		JSONObject result = new JSONObject();
+		JSONArray resultList = new JSONArray();
+		for(int i=0; i<list.size(); i++)
+			resultList.add(list.get(i));
+		result.put("List", resultList);
 		return result;
 	}
 	

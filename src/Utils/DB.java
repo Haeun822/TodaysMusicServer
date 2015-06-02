@@ -73,7 +73,7 @@ public class DB {
 		ArrayList<JSONObject> list = new ArrayList<JSONObject>();
 		
 		try{
-			rs = st.executeQuery("SELECT * FROM List WHERE UserID = '" + ID + "';");
+			rs = st.executeQuery("SELECT * FROM List WHERE UserID = '" + ID + "' ORDER BY SharedTime DESC;");
 			while(rs.next()){
 				JSONObject json = new JSONObject();
 				json.put("MusicID", rs.getString("MusicID"));
@@ -94,9 +94,9 @@ public class DB {
 		
 		try{
 			String query = "SELECT * FROM List WHERE ";
-			query += "UserID = '" + ID + "' ";
+			query += "(UserID = '" + ID + "' AND IsShared = 1)";
 			for(int i=0; i<Followed.size(); i++)
-				query += " OR UserID = '" + Followed.get(i) + "' ";
+				query += " OR (UserID = '" + Followed.get(i) + "' AND IsShared = 1)";
 			query += ";";
 			
 			rs = st.executeQuery(query);

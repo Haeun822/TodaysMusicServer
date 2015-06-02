@@ -12,6 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import Utils.DB;
 import Utils.Manager;
 
 @WebServlet("/MusicList")
@@ -28,12 +29,20 @@ public class MusicList extends HttpServlet {
 		if(JSON != null){
 			JSONObject json = (JSONObject) JSONValue.parse(JSON);
 			
+			String type = (String)json.get("Type");
 			String userID = (String)json.get("ID");
-			JSONArray musicArray = (JSONArray)json.get("Musics"); 
 			
-			for(int i=0; i<musicArray.size(); i++){
-				JSONObject musicData = (JSONObject)musicArray.get(i);
-				Manager.RegisterMusicList(userID, musicData);
+			if(type.equals("Register")){
+				JSONArray musicArray = (JSONArray)json.get("Musics"); 
+				
+				for(int i=0; i<musicArray.size(); i++){
+					JSONObject musicData = (JSONObject)musicArray.get(i);
+					Manager.RegisterMusicList(userID, musicData);
+				}
+			}
+			else if(type.equals("View")){
+				json = Manager.getMusicList(userID);
+				response.getWriter().print(json);
 			}
 		}
 	}
