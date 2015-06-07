@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -34,8 +35,10 @@ public class Follow extends HttpServlet{
 			if(type.equals("Get")){
 				ArrayList<String> list = DB.getFollowedUsers((String)json.get("Follower"));
 				json.clear();
+				JSONArray array = new JSONArray();
 				for(int i=0; i<list.size(); i++)
-					json.put(i, list.get(i));
+					array.add(list.get(i));
+				json.put("List", array);
 				response.getWriter().print(json);
 			}
 			else if(type.equals("Register")){

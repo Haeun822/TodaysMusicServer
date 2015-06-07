@@ -15,7 +15,7 @@ public class DB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			
-			String uri = "jdbc:mysql://52.11.70.122:3306/tdm";
+			String uri = "jdbc:mysql://127.0.0.1:3306/tdm";
 			String id = "root";
 			String pw = "root";
 			
@@ -73,10 +73,13 @@ public class DB {
 		ArrayList<JSONObject> list = new ArrayList<JSONObject>();
 		
 		try{
-			rs = st.executeQuery("SELECT * FROM List WHERE UserID = '" + ID + "' ORDER BY SharedTime DESC;");
+			rs = st.executeQuery("SELECT * FROM List, Music WHERE List.UserID = '" + ID + "' AND List.MusicID = Music.ID ORDER BY SharedTime DESC;");
 			while(rs.next()){
 				JSONObject json = new JSONObject();
 				json.put("MusicID", rs.getString("MusicID"));
+				json.put("Title", rs.getString("Title"));
+				json.put("Artist", rs.getString("Artist"));
+				json.put("URL", rs.getString("URL"));
 				json.put("Star", rs.getInt("Star"));
 				json.put("Time", rs.getString("Time"));
 				json.put("Feel", rs.getString("Feel"));
@@ -93,11 +96,11 @@ public class DB {
 		ArrayList<JSONObject> list = new ArrayList<JSONObject>();
 		
 		try{
-			String query = "SELECT * FROM List WHERE ";
+			String query = "SELECT * FROM List, Music WHERE List.MusicID = Music.ID AND (";
 			query += "(UserID = '" + ID + "' AND IsShared = 1)";
 			for(int i=0; i<Followed.size(); i++)
 				query += " OR (UserID = '" + Followed.get(i) + "' AND IsShared = 1)";
-			query += ";";
+			query += ") ORDER BY SharedTime DESC;";
 			
 			rs = st.executeQuery(query);
 			while(rs.next()){
@@ -108,6 +111,7 @@ public class DB {
 				json.put("Time", rs.getString("Time"));
 				json.put("Feel", rs.getString("Feel"));
 				json.put("SharedTime", rs.getTimestamp("SharedTime").toString());
+				json.put("IsShared", rs.getBoolean("IsShared"));
 				
 				list.add(json);
 			}
