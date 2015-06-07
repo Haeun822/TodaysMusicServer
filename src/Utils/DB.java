@@ -107,11 +107,13 @@ public class DB {
 				JSONObject json = new JSONObject();
 				json.put("UserID", rs.getString("UserID"));
 				json.put("MusicID", rs.getString("MusicID"));
+				json.put("Title", rs.getString("Title"));
+				json.put("Artist", rs.getString("Artist"));
+				json.put("URL", rs.getString("URL"));
 				json.put("Star", rs.getInt("Star"));
 				json.put("Time", rs.getString("Time"));
 				json.put("Feel", rs.getString("Feel"));
 				json.put("SharedTime", rs.getTimestamp("SharedTime").toString());
-				json.put("IsShared", rs.getBoolean("IsShared"));
 				
 				list.add(json);
 			}
