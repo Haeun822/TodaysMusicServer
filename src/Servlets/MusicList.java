@@ -25,6 +25,7 @@ public class MusicList extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String JSON = request.getParameter("JSON");
+		response.setContentType("text/html; charset=UTF-8");
 		
 		if(JSON != null){
 			JSONObject json = (JSONObject) JSONValue.parse(JSON);
@@ -44,6 +45,12 @@ public class MusicList extends HttpServlet {
 				json = Manager.getMusicList(userID);
 				response.getWriter().print(json);
 			}
+			else if(type.equals("Delete")){
+				String musicID = (String)json.get("MusicID");
+				DB.deleteMusicList(userID, musicID);
+			}
+			
+			response.getWriter().print("");
 		}
 	}
 }

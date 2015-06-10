@@ -15,7 +15,7 @@ public class DB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			
-			String uri = "jdbc:mysql://127.0.0.1:3306/tdm";
+			String uri = "jdbc:mysql://0.0.0.0:3306/tdm";
 			String id = "root";
 			String pw = "root";
 			
@@ -51,8 +51,11 @@ public class DB {
 	
 	public static void registerMusic(String ID, String Title, String Artist, String URL){
 		try {
-			st.executeUpdate("INSERT INTO Music VALUES('" + ID + "', '" + Title + "', '" + Artist + "', '" + URL + "')"
-							+ "ON DUPLICATE KEY UPDATE ID = '" + ID + "', Title = '" + Title + "', Artist = '" + Artist + "', URL = '" + URL + "';");
+			rs = st.executeQuery("SELECT * FROM Music WHERE ID = '" + ID + "';");
+			if(!rs.next()){
+				st.executeUpdate("INSERT INTO Music VALUES('" + ID + "', '" + Title + "', '" + Artist + "', '" + URL + "');");
+				
+			}
 		} catch (SQLException e) { }
 	}
 	
@@ -66,6 +69,12 @@ public class DB {
 			else{
 				st.executeUpdate("INSERT INTO List VALUES('" + userID + "', '" + musicID + "', " + star + ", '" + time + "', '" + feel + "', CURRENT_TIMESTAMP, '" + isShared + "');");
 			}
+		} catch (SQLException e) { System.out.println(e.getMessage()); }
+	}
+	
+	public static void deleteMusicList(String userID, String musicID){
+		try{
+			st.executeUpdate("DELETE FROM List WHERE UserID = '" + userID + "' AND MusicID = '" + musicID + "';");
 		} catch (SQLException e) { }
 	}
 
@@ -84,6 +93,7 @@ public class DB {
 				json.put("Time", rs.getString("Time"));
 				json.put("Feel", rs.getString("Feel"));
 				json.put("SharedTime", rs.getTimestamp("SharedTime").toString());
+				json.put("IsShared", rs.getBoolean("IsShared"));
 				
 				list.add(json);
 			}

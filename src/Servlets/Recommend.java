@@ -23,6 +23,7 @@ public class Recommend extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String JSON = request.getParameter("JSON");
+		response.setContentType("text/html; charset=UTF-8");
 		
 		if(JSON != null){
 			JSONObject json = (JSONObject) JSONValue.parse(JSON);

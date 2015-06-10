@@ -1,6 +1,7 @@
 package Servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -8,13 +9,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jdk.nashorn.internal.parser.JSONParser;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import Utils.DB;
 import Utils.Manager;
+import Utils.MusicServer;
 
-@WebServlet("/TimeLine")
-public class TimeLine extends HttpServlet {
+@WebServlet("/Search")
+public class Search extends HttpServlet{
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
@@ -27,10 +33,10 @@ public class TimeLine extends HttpServlet {
 		
 		if(JSON != null){
 			JSONObject json = (JSONObject) JSONValue.parse(JSON);
-			Long start = (long) json.get("start");
-			Long count = (long) json.get("count");
+			String artist = (String)json.get("Artist");
+			String title = (String)json.get("Title");
 			
-			json = Manager.TimeLine((String)json.get("ID"), start.intValue(), count.intValue());
+			json = MusicServer.searchMusic(artist, title, 0, 20);
 			response.getWriter().print(json);
 		}
 		else{
@@ -39,4 +45,5 @@ public class TimeLine extends HttpServlet {
 			response.getWriter().print(json);
 		}
 	}
+
 }

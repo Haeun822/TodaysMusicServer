@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -36,8 +37,16 @@ public class MusicServer {
 			json.put("title", title);
 		json.put("start", start);
 		json.put("count", count);
-
-		return connectServer("music/search", json);
+		
+		json = connectServer("music/search", json);
+		JSONArray array = (JSONArray)json.get("tracks");
+		if(array != null){
+			for(int i=0; i<array.size(); i++){
+				JSONObject temp = (JSONObject)array.get(i);
+				DB.registerMusic((String)temp.get("track_id"), (String)temp.get("title"), (String)temp.get("artist"), (String)temp.get("url"));
+			}
+		}
+		return json;
 	}
 	
 	static JSONObject connectServer(String subURL, JSONObject postData){

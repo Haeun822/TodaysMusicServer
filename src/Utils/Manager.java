@@ -13,21 +13,22 @@ public class Manager {
 		String artist = (String)musicData.get("Artist");
 		String time = (String)musicData.get("Time");
 		String feel = (String)musicData.get("Feel");
-		int star = (Integer)musicData.get("Star");
-		int isShared = (Integer)musicData.get("IsShared");
+		Long star_long = (long)musicData.get("Star");
+		int star = star_long.intValue();
+		boolean isShared = (boolean)musicData.get("IsShared");
 		
 		if(musicID == null){
-			musicData = MusicServer.searchMusic(artist, title, 0, 1);
-			musicData = (JSONObject)((JSONArray)musicData.get("tracks")).get(0);
-			musicID = (String)musicData.get("track_id");
-			title = (String)musicData.get("title");
-			artist = (String)musicData.get("artist");
-			String url = (String)musicData.get("url");
-			
+			JSONObject tempData = MusicServer.searchMusic(artist, title, 0, 1);
+			tempData = (JSONObject)((JSONArray)musicData.get("tracks")).get(0);
+			musicID = (String)tempData.get("track_id");
+			title = (String)tempData.get("title");
+			artist = (String)tempData.get("artist");
+			String url = (String)tempData.get("url");
+		
 			DB.registerMusic(musicID, title, artist, url);
 		}
 		
-		DB.registerMusicList(ID, musicID, star, time, feel, isShared);
+		DB.registerMusicList(ID, musicID, star, time, feel, (isShared == true)?1:0);
 	}
 	
 	public static JSONObject Recommend(String ID, String time, String feel){
@@ -36,27 +37,31 @@ public class Manager {
 
 		int itemNum = 10;
 		for (int i = 0; i < list.size(); i++) {
-			JSONObject temp = MusicServer.recommendMusic((String) list.get(i)
-					.get("MusicID"), itemNum);
+			JSONObject temp = MusicServer.recommendMusic((String) list.get(i).get("MusicID"), itemNum);
 			JSONArray tempArray = (JSONArray) temp.get("tracks");
 			int star = (int) list.get(i).get("Star");
 
 			for (int j = 0; j < tempArray.size(); j++) {
 				JSONObject json = (JSONObject) tempArray.get(j);
 				if (resultList.size() == 0) {
+					json.put("tscore",	star * 5 + (double) json.get("score"));
 					resultList.add(json);
-					resultList.get(0).put("tscore",	star * 10 + (double) json.get("score"));
-				} else if (resultList.contains(json))
+				} 
+				else if (resultList.contains(json))
 					break;
 				else {
+					boolean check = false;
 					for (int k = 0; k < resultList.size(); k++) {
-
-						if ((double) resultList.get(k).get("tscore") < (star * 10 + (double) json
-								.get("score"))) {
+						if ((double) resultList.get(k).get("tscore") < (star * 5 + (double) json.get("score"))) {
+							json.put("tscore",	star * 5 + (double) json.get("score"));
 							resultList.add(k, json);
-							resultList.get(k).put("tscore",	star * 10 + (double) json.get("score"));
+							check = true;
 							break;
 						}
+					}
+					if(check == false){
+						json.put("tscore",	star * 5 + (double) json.get("score"));
+						resultList.add(json);
 					}
 				}
 
