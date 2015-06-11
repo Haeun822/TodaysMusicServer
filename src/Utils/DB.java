@@ -15,7 +15,7 @@ public class DB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			
-			String uri = "jdbc:mysql://0.0.0.0:3306/tdm";
+			String uri = "jdbc:mysql://52.11.70.122:3306/tdm";
 			String id = "root";
 			String pw = "root";
 			
@@ -139,6 +139,12 @@ public class DB {
 		} catch (SQLException e) { }
 	}
 	
+	public static void unregisterFollow(String userID, String followedID){
+		try {
+			st.executeUpdate("DELETE FROM Follow WHERE Follower = '" + userID + "' AND Followed = '" + followedID + "';");
+		} catch (SQLException e) { }
+	}
+	
 	public static ArrayList<String> getFollowedUsers(String userID){
 		ArrayList<String> list = new ArrayList<String>();
 		try {
@@ -146,6 +152,30 @@ public class DB {
 			
 			while(rs.next())
 				list.add(rs.getString("Followed"));
+		} catch (SQLException e) { }
+		
+		return list;
+	}
+	
+	public static ArrayList<String> getFollowingUsers(String userID){
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			rs = st.executeQuery("SELECT Follower FROM Follow WHERE Followed = '" + userID + "';");
+			
+			while(rs.next())
+				list.add(rs.getString("Follower"));
+		} catch (SQLException e) { }
+		
+		return list;
+	}
+	
+	public static ArrayList<String> searchUsers(String ID){
+		ArrayList<String> list = new ArrayList<String>();
+		try{
+			rs = st.executeQuery("SELECT ID FROM User WHERE ID LIKE '%" + ID + "%';");
+			
+			while(rs.next())
+				list.add(rs.getString("ID"));
 		} catch (SQLException e) { }
 		
 		return list;

@@ -19,16 +19,20 @@ public class Manager {
 		
 		if(musicID == null){
 			JSONObject tempData = MusicServer.searchMusic(artist, title, 0, 1);
-			tempData = (JSONObject)((JSONArray)musicData.get("tracks")).get(0);
-			musicID = (String)tempData.get("track_id");
-			title = (String)tempData.get("title");
-			artist = (String)tempData.get("artist");
-			String url = (String)tempData.get("url");
-		
-			DB.registerMusic(musicID, title, artist, url);
+			JSONArray array = (JSONArray)tempData.get("tracks");
+			if(array.size() != 0){
+				tempData = (JSONObject)array.get(0);
+				musicID = (String)tempData.get("track_id");
+				title = (String)tempData.get("title");
+				artist = (String)tempData.get("artist");
+				String url = (String)tempData.get("url");
+			
+				DB.registerMusic(musicID, title, artist, url);
+			}
 		}
 		
-		DB.registerMusicList(ID, musicID, star, time, feel, (isShared == true)?1:0);
+		if(musicID != null)
+			DB.registerMusicList(ID, musicID, star, time, feel, (isShared == true)?1:0);
 	}
 	
 	public static JSONObject Recommend(String ID, String time, String feel){
@@ -100,6 +104,16 @@ public class Manager {
 		}
 		
 		result.put("List", resultArray);		
+		return result;
+	}
+	
+	public static JSONObject searchUser(String ID){
+		ArrayList<String> list = DB.searchUsers(ID);
+		JSONObject result = new JSONObject();
+		JSONArray resultList = new JSONArray();
+		for(int i=0; i<list.size(); i++)
+			resultList.add(list.get(i));
+		result.put("List", resultList);
 		return result;
 	}
 }

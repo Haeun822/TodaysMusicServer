@@ -34,7 +34,13 @@ public class Follow extends HttpServlet{
 			String type = (String)json.get("Type");
 			
 			if(type.equals("Get")){
-				ArrayList<String> list = DB.getFollowedUsers((String)json.get("Follower"));
+				String Follower = (String)json.get("Follower");
+				String Followed = (String)json.get("Followed");
+				ArrayList<String> list;
+				if(Follower != null && !Follower.isEmpty())
+					list = DB.getFollowedUsers(Follower);
+				else
+					list = DB.getFollowingUsers(Followed);
 				json.clear();
 				JSONArray array = new JSONArray();
 				for(int i=0; i<list.size(); i++)
@@ -44,6 +50,9 @@ public class Follow extends HttpServlet{
 			}
 			else if(type.equals("Register")){
 				DB.registerFollow((String)json.get("Follower"), (String)json.get("Followed"));
+			}
+			else if(type.equals("Unregister")){
+				DB.unregisterFollow((String)json.get("Follower"), (String)json.get("Followed"));
 			}
 		}
 		else{
